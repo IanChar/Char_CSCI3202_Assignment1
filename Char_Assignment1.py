@@ -91,59 +91,43 @@ class BinaryTree(object):
     def __init__(self, rootValue):
         self.root = Node(rootValue)
         # Map where the key is some integer and the value is a list of nodes.
-        self.keyNodeMap = {rootValue: [self.root]}
+        self.keyNodeMap = {rootValue: self.root}
 
     def getRoot(self):
         return self.root
 
-    # Will try to add to the oldest node with parentValue first.
-    # This will add one node to the tree at most.
     def add(self, value, parentValue):
         if not parentValue in self.keyNodeMap:
             print "Parent not found."
             return
-        parentList = self.keyNodeMap[parentValue]
-        nodeHasBeenAdded = False
-        for n in parentList:
-            if n.getLeftChild() is None:
-                newNode = Node(value, n)
-                n.setLeftChild(newNode)
-                if not value in self.keyNodeMap:
-                    self.keyNodeMap[value] = [newNode]
-                else:
-                    self.keyNodeMap[value].append(newNode)
-                nodeHasBeenAdded = True
-                break
-            elif n.getRightChild() is None:
-                newNode = Node(value, n)
-                n.setRightChild(newNode)
-                if not value in self.keyNodeMap:
-                    self.keyNodeMap[value] = [newNode]
-                else:
-                    self.keyNodeMap[value].append(newNode)
-                nodeHasBeenAdded = True
-                break
-        if not nodeHasBeenAdded:
-            print "Parent(s) has two children, node not added."
+        if value in self.keyNodeMap:
+            print "This value has already been added."
+            return
+        parentNode = self.keyNodeMap[parentValue]
+        if parentNode.getLeftChild() is None:
+            newNode = Node(value, parentNode)
+            parentNode.setLeftChild(newNode)
+            self.keyNodeMap[value] = newNode
+        elif parentNode.getRightChild() is None:
+            newNode = Node(value, parentNode)
+            parentNode.setRightChild(newNode)
+            self.keyNodeMap[value] = newNode
 
     # Will delete all valid nodes with the given value
     def delete(self, value):
         if not value in self.keyNodeMap:
             print "Node not found."
             return
-        nodeList = self.keyNodeMap[value]
-        for n in nodeList:
-            if n.getLeftChild() is None and n.getRightChild() is None:
-                parent = n.getParent()
-                if parent.getLeftChild() is n:
-                    parent.setLeftChild(None)
-                else:
-                    parent.setRightChild(None)
-                nodeList.remove(n)
+        node = self.keyNodeMap[value]
+        if node.getLeftChild() is None and node.getRightChild() is None:
+            parent = node.getParent()
+            if parent.getLeftChild() is node:
+                parent.setLeftChild(None)
             else:
-                print "Node not deleted, has children."
-        if len(nodeList) == 0:
+                parent.setRightChild(None)
             del self.keyNodeMap[value]
+        else:
+            print "Node not deleted, has children."
 
     # Returns a string. Will be called in the context: print <someTreeHere>
     def __str__(self):

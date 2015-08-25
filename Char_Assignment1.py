@@ -90,6 +90,7 @@ class Node(object):
 class BinaryTree(object):
     def __init__(self, rootValue):
         self.root = Node(rootValue)
+        # Map where the key is some integer and the value is a list of nodes.
         self.keyNodeMap = {rootValue: [self.root]}
 
     def getRoot(self):
@@ -154,9 +155,68 @@ class BinaryTree(object):
                     + printCurrNode(currNode.getRightChild()))
         return printCurrNode(self.root)
 
+# 4. Graph
+class Vertex(object):
+    def __init__(self, value):
+        self.value = value
+        # Dictionary where key is some value and value is corresponding vertex.
+        self.edges = {}
+
+    def getValue(self):
+        return self.value
+
+    def setValue(self, value):
+        self.value = value
+
+    def getEdges(self):
+        return self.edges
+
+    def addEdge(self, vertex):
+        if not isinstance(vertex, Vertex):
+            raise TypeError("Edge must be to a Vertex.")
+        self.edges[vertex.getValue()] = vertex
+
+    def __str__(self):
+        return str(value)
+
+class Graph(object):
+    def __init__(self):
+        # Dictionary where key is some int and value is corresponding vertex.
+        self.vertices = {}
+
+    def addVertex(self, value):
+        if value in self.vertices:
+            print "Vertex already exists."
+        else:
+            self.vertices[value] = Vertex(value)
+
+    def addEdge(self, value1, value2):
+        if not value1 in self.vertices or not value2 in self.vertices:
+            print "One or more vertices not found."
+            return
+        vertex1 = self.vertices[value1]
+        vertex2 = self.vertices[value2]
+        vertex1.addEdge(vertex2)
+        vertex2.addEdge(vertex1)
+
+    def findVertex(self, value):
+        if not value in self.vertices:
+            print "Vertex not in graph."
+            return
+        vertex = self.vertices[value]
+        print "Vertex with value", value, "is in the graph adjacent to..."
+        edges = vertex.getEdges()
+        if len(edges) == 0:
+            print "Nothing"
+        else:
+            for adj in vertex.getEdges():
+                print adj
+        print ""
+
 # 5. Testing
 import random
-def testStrucs():
+
+def testQueue():
     print "-----------------1 Queue-----------------"
     queue = Queue()
     # Queue 10 random integers
@@ -169,6 +229,7 @@ def testStrucs():
     for _ in range(10):
         print "Dequeueing", queue.pop()
 
+def testStack():
     print "\n-----------------2 Stack-----------------"
     stack = Stack()
     # Push 10 random integers onto the stack
@@ -181,6 +242,7 @@ def testStrucs():
     for _ in range(10):
         print "Popped", stack.pop(), " Current size:", stack.checkSize()
 
+def testTree():
     print "\n-----------------3 Tree-----------------"
     print "Building tree... "
     tree = BinaryTree(0)
@@ -198,6 +260,38 @@ def testStrucs():
     tree.delete(6)
     tree.delete(7)
     print tree
+
+def testGraph():
+    print "\n-----------------4 Graph-----------------"
+    graph = Graph()
+    print "\nAdding vertices..."
+    for i in range(10):
+        graph.addVertex(i)
+    graph.addVertex(10)
+
+    print "\nAdding edges..."
+    for i in range(8):
+        graph.addEdge(i, i + 1)
+        graph.addEdge(i, i + 2)
+    graph.addEdge(5, 3)
+    graph.addEdge(7, 1)
+    graph.addEdge(0, 9)
+    graph.addEdge(9, 8)
+
+    print "\nFinding vertices..."
+    graph.findVertex(0)
+    graph.findVertex(1)
+    graph.findVertex(3)
+    graph.findVertex(7)
+    graph.findVertex(8)
+    graph.findVertex(9)
+    graph.findVertex(10)
+
+def testStrucs():
+    testQueue()
+    testStack()
+    testTree()
+    testGraph()
 
 if __name__ == "__main__":
     testStrucs()

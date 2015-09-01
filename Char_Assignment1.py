@@ -149,6 +149,8 @@ class BinaryTree(object):
 # 4. Graph
 class Vertex(object):
     def __init__(self, value):
+        if not isinstance(value, int):
+            raise TypeError("Vertices must have value with type int.")
         self.value = value
         # Dictionary where key is some value and value is corresponding vertex.
         self.edges = {}
@@ -157,6 +159,8 @@ class Vertex(object):
         return self.value
 
     def setValue(self, value):
+        if not isinstance(value, int):
+            raise TypeError("Vertices must have value with type int.")
         self.value = value
 
     def getEdges(self):
@@ -324,6 +328,12 @@ def testGraph():
     print "\nTry to add non-unique vertex..."
     graph.addVertex(1)
 
+    print "\nTry to add a non-integer vertex..."
+    try:
+        graph.addVertex("This should fail.")
+        print "Something went wrong!"
+    except TypeError:
+        print "Type error raised successfully from vertex constructor."
     print "\nAdding edges..."
     for i in range(8):
         graph.addEdge(i, i + 1)
@@ -346,6 +356,9 @@ def testGraph():
     graph.findVertex(8)
     graph.findVertex(9)
     graph.findVertex(10)
+
+    print "\nLook for a vertex not in the graph..."
+    graph.findVertex(-1)
 
 def testStrucs():
     testQueue()

@@ -1,16 +1,19 @@
+# Ian Char
+# Intro to AI
+
 # 1. Queue
 from Queue import Queue as BuiltInQueue
 class Queue(object):
     def __init__(self):
         self.builtInQueue = BuiltInQueue()
 
-    def push(self, someInteger):
+    def enqueue(self, someInteger):
         if isinstance(someInteger, int):
             self.builtInQueue.put(someInteger)
         else:
             raise TypeError("This queue only accepts integers.")
 
-    def pop(self):
+    def dequeue(self):
         if self.builtInQueue.qsize() == 0:
             raise IndexError("Pop from empty queue.")
         return self.builtInQueue.get()
@@ -43,6 +46,8 @@ class Stack(object):
 # 3. Binary Tree
 class Node(object):
     def __init__(self, key, parent = None, leftChild = None, rightChild = None):
+        if not isinstance(key, int):
+            raise TypeError("Nodes can only have integers for keys.")
         self.key = key
         self.parent = parent
         self.leftChild = leftChild
@@ -113,19 +118,21 @@ class BinaryTree(object):
             parentNode.setRightChild(newNode)
             self.keyNodeMap[value] = newNode
 
-    # Will delete all valid nodes with the given value
     def delete(self, value):
         if not value in self.keyNodeMap:
             print "Node not found."
             return
         node = self.keyNodeMap[value]
         if node.getLeftChild() is None and node.getRightChild() is None:
-            parent = node.getParent()
-            if parent.getLeftChild() is node:
-                parent.setLeftChild(None)
+            if node is self.root:
+                print "Cannot delete root node."
             else:
-                parent.setRightChild(None)
-            del self.keyNodeMap[value]
+                parent = node.getParent()
+                if parent.getLeftChild() is node:
+                    parent.setLeftChild(None)
+                else:
+                    parent.setRightChild(None)
+                del self.keyNodeMap[value]
         else:
             print "Node not deleted, has children."
 
@@ -203,33 +210,74 @@ import random
 def testQueue():
     print "-----------------1 Queue-----------------"
     queue = Queue()
-    # Queue 10 random integers
+
+    print "\nTry to dequeue an empty queue..."
+    try:
+        queue.dequeue()
+        print "Something went wrong!"
+    except IndexError:
+        print "Dequeue index error successfully raised."
+
+    print "\nQueue 10 random integers..."
     for _ in range(10):
         randInt = random.randrange(100)
         print "Queueing", randInt
-        queue.push(randInt)
-    print ""
-    # Dequeue the 10 random integers and print them
+        queue.enqueue(randInt)
+
+    print "\nTry to enqueue something that isn't an integer..."
+    try:
+        queue.enqueue("This should fail.")
+        print "Something went wrong!"
+    except TypeError:
+        print "Enqueue type error successfully raised."
+
+    print "\nDequeue the 10 random integers and print them..."
     for _ in range(10):
-        print "Dequeueing", queue.pop()
+        print "Dequeueing", queue.dequeue()
 
 def testStack():
     print "\n-----------------2 Stack-----------------"
     stack = Stack()
-    # Push 10 random integers onto the stack
+    print "\nTry popping from empty stack..."
+    try:
+        stack.pop()
+        print "Something went wrong!"
+    except IndexError:
+        print "Pop index error successfully raised."
+
+    print "\nPush 10 random integers onto the stack..."
     for _ in range(10):
         randInt = random.randrange(100)
         stack.push(randInt)
         print "Pushing", randInt, " Current size:", stack.checkSize()
-    print ""
-    # Pop 10 random integers off the stack
+
+    print "\nTry pushing non-integer onto the stack..."
+    try:
+        stack.push("This should fail.")
+        print "Something went wrong!"
+    except TypeError:
+        print "Push type error successfully raised."
+
+    print "\nPop the 10 integers off of the stack..."
     for _ in range(10):
         print "Popped", stack.pop(), " Current size:", stack.checkSize()
 
 def testTree():
     print "\n-----------------3 Tree-----------------"
-    print "Building tree... "
+
+    print "\nTry to make a tree with a non-integer node..."
+    try:
+        BinaryTree("This should fail.")
+        print "Something went wrong!"
+    except TypeError:
+        print "Node constructor raised type error successfully."
+
     tree = BinaryTree(0)
+
+    print "\nTry to delete root node..."
+    tree.delete(0)
+
+    print "\nAdd 10 integers to the tree... "
     tree.add(1, 0)
     tree.add(2, 0)
     tree.add(3, 1)
@@ -239,19 +287,42 @@ def testTree():
     tree.add(7, 3)
     tree.add(8, 3)
     tree.add(9, 4)
+
+    print "\nTry to add node with invalid parent..."
+    tree.add(10, -1)
+
+    print "\nTry to add non-unique node..."
+    tree.add(1, 9)
+
+    print "\nPre-order printing of tree..."
     print tree
-    print "\nRemoving 6 and 7..."
+
+    print "\nTry to delete a node that doesn't exist..."
+    tree.delete(-1)
+
+    print "\nTry to delete nodes with children..."
+    tree.delete(3)
+    tree.delete(2)
+    tree.delete(1)
+
+    print "\nDelete nodes 6 and 7..."
     tree.delete(6)
     tree.delete(7)
+
+    print "\nAnother tree printing to reflect deletions."
     print tree
 
 def testGraph():
     print "\n-----------------4 Graph-----------------"
     graph = Graph()
+
     print "\nAdding vertices..."
     for i in range(10):
         graph.addVertex(i)
     graph.addVertex(10)
+
+    print "\nTry to add non-unique vertex..."
+    graph.addVertex(1)
 
     print "\nAdding edges..."
     for i in range(8):
@@ -261,6 +332,11 @@ def testGraph():
     graph.addEdge(7, 1)
     graph.addEdge(0, 9)
     graph.addEdge(9, 8)
+
+    print "\nTry to add invalid edges..."
+    graph.addEdge(1, -1)
+    graph.addEdge(-1, 1)
+    graph.addEdge(-1, -1)
 
     print "\nFinding vertices..."
     graph.findVertex(0)
